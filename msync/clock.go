@@ -107,9 +107,9 @@ func (c *clock) IsNewerThanOrSyncedWith(c2 Clocker) bool {
 }
 
 func (c *clock) IsConflictingWith(c2 Clocker) bool {
-	if c.local.IsNewerThan(c2.Local()) && c2.Cloud().IsNewerThan(c.cloud) {
-		return true
-	}
+	conflict1 := c.local.IsNewerThan(c2.Local()) && c2.Cloud().IsNewerThan(c.cloud)
 
-	return c.cloud.IsNewerThan(c2.Cloud()) && c2.Local().IsNewerThan(c.local)
+	conflict2 := c.cloud.IsNewerThan(c2.Cloud()) && c2.Local().IsNewerThan(c.local)
+
+	return conflict1 || conflict2
 }
