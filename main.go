@@ -1,5 +1,13 @@
 package main
 
+import (
+	"fmt"
+
+	"github.com/Jonnay101/clockSync/msync"
+)
+
 func main() {
-	// TODO: create clock sync
+	localClock := msync.NewClock()
+
+	fmt.Printf("%+v", localClock)
 }
