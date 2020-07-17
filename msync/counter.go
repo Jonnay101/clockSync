@@ -18,19 +18,18 @@ func NewCounter() Counter {
 }
 
 // Get returns the int64 value of the counter
-func (cnt counter) Get() int64 {
-	return int64(cnt)
+func (cnt *counter) Get() int64 {
+	return int64(*cnt)
 }
 
 // Set the value of the counter
 func (cnt *counter) Set(num int64) {
-	cntConv := counter(num)
-	cnt = &cntConv
+	*cnt = counter(num)
 }
 
 func (cnt *counter) Increment() {
 	plusOne := cnt.Get() + 1
-	cnt.Set(plusOne)
+	*cnt = counter(plusOne)
 }
 
 func (cnt *counter) IsSyncedWith(cnt2 Counter) bool {
