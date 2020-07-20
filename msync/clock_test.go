@@ -356,3 +356,87 @@ func Test_clock_IsSyncedWith(t *testing.T) {
 		})
 	}
 }
+
+func Test_clock_IsAheadOfOrSyncedWith(t *testing.T) {
+
+	newerClock := NewClock()
+	newerClock2 := NewClock()
+	olderClock := NewClock()
+
+	// cloud is newer
+	newerClock.SetLocal(2)
+	newerClock.SetCloud(3)
+
+	// local is newer
+	newerClock2.SetLocal(3)
+	newerClock2.SetCloud(2)
+
+	olderClock.SetLocal(2)
+	olderClock.SetCloud(2)
+
+	type args struct {
+		c2 Clocker
+	}
+	tests := []struct {
+		name string
+		c    Clocker
+		args args
+		want bool
+	}{
+
+		{"are the same", olderClock, args{olderClock}, true},
+		{"cloud is newer", newerClock, args{olderClock}, true},
+		{"local is newer", newerClock2, args{olderClock}, true},
+		{"is behind", olderClock, args{newerClock}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.c.IsAheadOfOrSyncedWith(tt.args.c2); got != tt.want {
+				t.Errorf("clock.IsAheadOfOrSyncedWith() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_clock_IsConflictingWith(t *testing.T) {
+
+	cloudAheadClock := NewClock()
+	localAheadClock := NewClock()
+	olderClock := NewClock()
+
+	// cloud is newer
+	cloudAheadClock.SetLocal(2)
+	cloudAheadClock.SetCloud(3)
+
+	// local is newer
+	localAheadClock.SetLocal(3)
+	localAheadClock.SetCloud(2)
+
+	olderClock.SetLocal(2)
+	olderClock.SetCloud(2)
+
+	type args struct {
+		c2 Clocker
+	}
+	tests := []struct {
+		name string
+		c    Clocker
+		args args
+		want bool
+	}{
+
+		{"in conflict - cloud then local", cloudAheadClock, args{localAheadClock}, true},
+		{"in conflict - local then cloud", localAheadClock, args{cloudAheadClock}, true},
+		{"cloud is newer", cloudAheadClock, args{olderClock}, false},
+		{"local is newer", localAheadClock, args{olderClock}, false},
+		{"the same", olderClock, args{olderClock}, false},
+		{"the behind", olderClock, args{cloudAheadClock}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.c.IsConflictingWith(tt.args.c2); got != tt.want {
+				t.Errorf("clock.IsConflictingWith() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
