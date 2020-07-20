@@ -6,7 +6,7 @@ type Counter interface {
 	Set(int64)
 	Increment()
 	IsSyncedWith(cnt2 Counter) bool
-	IsNewerThan(cnt2 Counter) bool
+	IsAheadOf(cnt2 Counter) bool
 }
 
 type counter int64
@@ -36,6 +36,6 @@ func (cnt *counter) IsSyncedWith(cnt2 Counter) bool {
 	return cnt.Get() == cnt2.Get()
 }
 
-func (cnt *counter) IsNewerThan(cnt2 Counter) bool {
+func (cnt *counter) IsAheadOf(cnt2 Counter) bool {
 	return cnt.Get() > cnt2.Get()
 }

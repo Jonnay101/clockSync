@@ -13,9 +13,9 @@ type Clocker interface {
 	CloudIsAhead() bool
 	CountersAreSynced() bool
 	// comparison methods
-	IsNewerThan(Clocker) bool
+	IsAheadOf(Clocker) bool
 	IsSyncedWith(Clocker) bool
-	IsNewerThanOrSyncedWith(Clocker) bool
+	IsAheadOfOrSyncedWith(Clocker) bool
 	IsConflictingWith(Clocker) bool
 }
 
@@ -85,15 +85,15 @@ func (c *clock) CountersAreSynced() bool {
 
 // CLOCK COMPARISONS
 
-// IsNewerThan compares the clock to another clock to see which is 'newest'
-func (c *clock) IsNewerThan(c2 Clocker) bool {
+// IsAheadOf compares the clock to another clock to see which is 'newest'
+func (c *clock) IsAheadOf(c2 Clocker) bool {
 	var localNewer, cloudNewer bool
 
-	if c.local.IsNewerThan(c2.Local()) {
+	if c.local.IsAheadOf(c2.Local()) {
 		localNewer = true
 	}
 
-	if c.cloud.IsNewerThan(c2.Cloud()) {
+	if c.cloud.IsAheadOf(c2.Cloud()) {
 		cloudNewer = true
 	}
 
@@ -127,17 +127,17 @@ func (c *clock) IsSyncedWith(c2 Clocker) bool {
 	return localSynced && cloudSynced
 }
 
-// IsNewerThanOrSyncedWith returns true if a clock is either newer or sync with another
-func (c *clock) IsNewerThanOrSyncedWith(c2 Clocker) bool {
-	return c.IsNewerThan(c2) || c.IsSyncedWith(c2)
+// IsAheadOfOrSyncedWith returns true if a clock is either newer or sync with another
+func (c *clock) IsAheadOfOrSyncedWith(c2 Clocker) bool {
+	return c.IsAheadOf(c2) || c.IsSyncedWith(c2)
 }
 
 // IsConflictingWith returns true if the clocks have conflicting states
 // eg. Cloud ahead on one clock and Local ahead on the other
 func (c *clock) IsConflictingWith(c2 Clocker) bool {
-	conflict1 := c.local.IsNewerThan(c2.Local()) && c2.Cloud().IsNewerThan(c.cloud)
+	conflict1 := c.local.IsAheadOf(c2.Local()) && c2.Cloud().IsAheadOf(c.cloud)
 
-	conflict2 := c.cloud.IsNewerThan(c2.Cloud()) && c2.Local().IsNewerThan(c.local)
+	conflict2 := c.cloud.IsAheadOf(c2.Cloud()) && c2.Local().IsAheadOf(c.local)
 
 	return conflict1 || conflict2
 }

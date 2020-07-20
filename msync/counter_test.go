@@ -151,7 +151,7 @@ func Test_counter_IsNewerThan(t *testing.T) {
 			testCounter2 := NewCounter()
 			testCounter2.Set(tt.num2)
 
-			if got := testCounter1.IsNewerThan(testCounter2); got != tt.want {
+			if got := testCounter1.IsAheadOf(testCounter2); got != tt.want {
 				t.Errorf("counter.IsNewerThan() = %v, want %v", got, tt.want)
 			}
 		})

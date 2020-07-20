@@ -276,7 +276,7 @@ func Test_clock_CountersAreSynced(t *testing.T) {
 	}
 }
 
-func Test_clock_IsNewerThan(t *testing.T) {
+func Test_clock_IsAheadOf(t *testing.T) {
 
 	newerClock := NewClock()
 	newerClock2 := NewClock()
@@ -309,8 +309,48 @@ func Test_clock_IsNewerThan(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.c.IsNewerThan(tt.args.c2); got != tt.want {
-				t.Errorf("clock.IsNewerThan() = %v, want %v", got, tt.want)
+			if got := tt.c.IsAheadOf(tt.args.c2); got != tt.want {
+				t.Errorf("clock.IsAheadOf() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_clock_IsSyncedWith(t *testing.T) {
+
+	newerClock := NewClock()
+	newerClock2 := NewClock()
+	olderClock := NewClock()
+
+	// cloud is newer
+	newerClock.SetLocal(2)
+	newerClock.SetCloud(3)
+
+	// local is newer
+	newerClock2.SetLocal(3)
+	newerClock2.SetCloud(2)
+
+	olderClock.SetLocal(2)
+	olderClock.SetCloud(2)
+
+	type args struct {
+		c2 Clocker
+	}
+	tests := []struct {
+		name string
+		c    Clocker
+		args args
+		want bool
+	}{
+		{"cloud is newer", newerClock, args{olderClock}, true},
+		{"local is newer", newerClock2, args{olderClock}, true},
+		{"is not newer", olderClock, args{newerClock}, false},
+		{"are the same", olderClock, args{olderClock}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.c.IsSyncedWith(tt.args.c2); got != tt.want {
+				t.Errorf("clock.IsSyncedWith() = %v, want %v", got, tt.want)
 			}
 		})
 	}
