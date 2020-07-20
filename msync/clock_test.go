@@ -342,10 +342,11 @@ func Test_clock_IsSyncedWith(t *testing.T) {
 		args args
 		want bool
 	}{
-		{"cloud is newer", newerClock, args{olderClock}, true},
-		{"local is newer", newerClock2, args{olderClock}, true},
-		{"is not newer", olderClock, args{newerClock}, false},
-		{"are the same", olderClock, args{olderClock}, false},
+
+		{"are the same", olderClock, args{olderClock}, true},
+		{"cloud is newer", newerClock, args{olderClock}, false},
+		{"local is newer", newerClock2, args{olderClock}, false},
+		{"is behind", olderClock, args{newerClock}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
